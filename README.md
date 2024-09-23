@@ -32,11 +32,11 @@ _Trong repository này, bạn sẽ tìm thấy:_
 
     _**Bài Tập Thực Hành**: Các bài tập và dự án thực tế để bạn có thể thực hành._
 
-## Cách Tham Gia / How to Contribute
-
-Nếu bạn có bất kỳ câu hỏi nào, đề xuất hoặc muốn đóng góp, đừng ngần ngại mở issue hoặc gửi pull request. Tôi rất vui lòng nhận được sự hỗ trợ và ý kiến từ cộng đồng!
+## How to Contribute / Cách Tham Gia
 
 If you have any questions, suggestions, or want to contribute, feel free to open an issue or submit a pull request. I welcome support and feedback from the community!
+
+_Nếu bạn có bất kỳ câu hỏi nào, đề xuất hoặc muốn đóng góp, đừng ngần ngại mở issue hoặc gửi pull request. Tôi rất vui lòng nhận được sự hỗ trợ và ý kiến từ cộng đồng!_
 
 ## Contact / Liên Hệ
 
