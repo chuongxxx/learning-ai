@@ -315,6 +315,14 @@ export class LinearRegressionSGD {
 }
 
 export class LinearRegressionNN {
+    /**
+     * Constructor for LinearRegressionNN.
+     * @param {Object} [options] - An object containing options for the constructor.
+     * @param {number} [options.learningRate=0.001] - The learning rate for the
+     *     gradient descent algorithm.
+     * @param {number} [options.epochs=20] - The number of epochs to run the
+     *     gradient descent algorithm for.
+     */
     constructor({ learningRate = 0.001, epochs = 20 }) {
         this.epochs = epochs;
         this.model = tf.sequential();
@@ -325,6 +333,14 @@ export class LinearRegressionNN {
         });
     }
 
+    /**
+     * Fit the model to the given data.
+     * @param {array} x The feature data. This should be a 2D array where each
+     *     subarray represents a single data point.
+     * @param {array} y The labels associated with the feature data. This should
+     *     be a 1D array of the same length as the feature data.
+     * @throws If the input is not a valid array.
+     */
     async fit(x, y) {
         const xTrain = tf.tensor2d(x, [x.length, x[0].length]);
         const yTrain = tf.tensor2d(y, [y.length, 1]);
@@ -338,6 +354,13 @@ export class LinearRegressionNN {
         });
     }
 
+    /**
+     * Predict the output for a given set of features.
+     * @param {array} x The feature data. This should be a 1D array.
+     * @return {tf.Tensor2D} A 2D tensor with a single row and a single column
+     *     for the predicted output.
+     * @throws If the input is not a valid array.
+     */
     predict(x) {
         return this.model.predict(tf.tensor2d(x, [x.length, 1]));
     }
