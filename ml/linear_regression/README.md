@@ -3,10 +3,22 @@
 ## I. Ordinary Least Squares
 
 $$
-X=\left[\begin{array}{cc}1 & x^{(1)}\\1 & x^{(2)}\\...\\1 & x^{(n)}
+X = \left[\begin{array}{cc}
+1 & x^{(1)} \\
+1 & x^{(2)} \\
+\vdots & \vdots \\
+1 & x^{(n)}
 \end{array}\right],
-w=\left[\begin{array}{cc}w_0\\w_1\\\end{array}\right],
-y=Xw=\left[\begin{array}{cc}y_1\\y_2\\...\\y_n\end{array}\right]
+w = \left[\begin{array}{c}
+w_0 \\
+w_1
+\end{array}\right],
+y = Xw = \left[\begin{array}{c}
+y_1 \\
+y_2 \\
+\vdots \\
+y_n
+\end{array}\right]
 $$
 
 $$
