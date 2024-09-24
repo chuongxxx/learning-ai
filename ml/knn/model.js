@@ -1,17 +1,3 @@
-// 1. Select K-Nearest Neighbors
-// 2. Find the distance between the query point and all training points
-// 3. Sort the training points by distance
-// 4. Select the k closest points
-// 5. Find the most common class among the k closest points
-// 6. Return the class with the highest number of votes
-
-// Some distances:
-// Euclidean distance: https://en.wikipedia.org/wiki/Euclidean_distance
-// Manhattan distance: https://en.wikipedia.org/wiki/Manhattan_distance
-// Chebyshev distance: https://en.wikipedia.org/wiki/Chebyshev_distance
-// Hamming distance: https://en.wikipedia.org/wiki/Hamming_distance
-// Minkowski distance: https://en.wikipedia.org/wiki/Minkowski_distance
-
 import * as tf from "@tensorflow/tfjs";
 
 import { findMostCommonLabel } from "../utils/common.util.js";
