@@ -112,7 +112,37 @@ _Trả về giá trị trung bình như là giá trị dự đoán._
 
 ---
 
-## III. Some common distances
+## III. KNN with KD Tree
+
+### 1. What is KD Tree?
+
+A **KD Tree** (K-dimensional tree) is a data structure used to efficiently partition space for nearest neighbor search. It organizes points in a k-dimensional space to allow quick search and retrieval of the closest points.
+
+#### 1. KD Tree là gì?
+
+_KD Tree (cây K chiều) là một cấu trúc dữ liệu được sử dụng để phân vùng không gian hiệu quả trong tìm kiếm hàng xóm gần nhất. Nó sắp xếp các điểm trong không gian k chiều để giúp tìm kiếm và truy xuất nhanh các điểm gần nhất._
+
+### 2. How KNN works with KD Tree
+
+Instead of calculating the distance from the query point to all training points, the KD Tree reduces the search space by eliminating points that are far away, speeding up the nearest neighbor search. This method is especially useful when dealing with large datasets or high-dimensional data.
+
+#### 2. KNN hoạt động với KD Tree như thế nào?
+
+_Thay vì tính khoảng cách từ điểm truy vấn đến tất cả các điểm huấn luyện, KD Tree giảm không gian tìm kiếm bằng cách loại bỏ các điểm xa, giúp tăng tốc quá trình tìm kiếm hàng xóm gần nhất. Phương pháp này đặc biệt hữu ích khi xử lý tập dữ liệu lớn hoặc dữ liệu có nhiều chiều._
+
+### 3. Building and querying a KD Tree
+
+-   **Building a KD Tree**: Split the data recursively along the axis with the highest variance. At each node, store a point, and recursively partition the space into two halves.
+-   **Querying a KD Tree**: Use a recursive search to navigate the tree. The search compares the query point with the points stored in the nodes and backtracks to ensure all possible closer points are considered.
+
+#### 3. Xây dựng và truy vấn KD Tree
+
+-   **Xây dựng KD Tree**: Chia dữ liệu đệ quy theo trục có phương sai lớn nhất. Tại mỗi nút, lưu một điểm và phân vùng không gian thành hai nửa.
+-   **Truy vấn KD Tree**: Sử dụng tìm kiếm đệ quy để điều hướng cây. Quá trình tìm kiếm so sánh điểm truy vấn với các điểm được lưu trữ trong các nút và quay lại để đảm bảo tất cả các điểm có khả năng gần hơn đều được xem xét.
+
+---
+
+## IV. Some common distances
 
 Here are some common distance measures that can be used in KNN:
 
@@ -122,7 +152,7 @@ Here are some common distance measures that can be used in KNN:
 -   **Hamming distance**: [Learn more](https://en.wikipedia.org/wiki/Hamming_distance)
 -   **Minkowski distance**: [Learn more](https://en.wikipedia.org/wiki/Minkowski_distance)
 
-### III. Một số khoảng cách phổ biến
+### IV. Một số khoảng cách phổ biến
 
 Dưới đây là một số khoảng cách phổ biến có thể sử dụng trong KNN:
 
