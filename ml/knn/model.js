@@ -1,9 +1,8 @@
 import * as tf from "@tensorflow/tfjs";
 
-import { findMostCommonLabel } from "../utils/common.util.js";
 import { euclideanDistance } from "./distance.js";
 
-export class KNN {
+class BaseKNN {
     constructor({ k = 3, distanceFunction }) {
         this.k = k;
         this.distanceFunction = distanceFunction || euclideanDistance;
@@ -11,32 +10,25 @@ export class KNN {
 
     fit(x, y) {
         this.x = tf.tensor2d(x, [x.length, x[0].length]);
-        this.y = tf.tensor1d(y, "int32");
+        this.y = tf.tensor1d(y);
     }
 
-    predict(x) {
-        const predictions = x.map((item) => this._predictOne(item));
-        return predictions;
-    }
-
-    _predictOne(x) {
+    getNeighbors(x) {
         const tfX = tf.tensor1d(x);
-
-        // calculate the distance between the query point and all training points
         const distances = this.distanceFunction(tfX, this.x);
 
-        // Get the k nearest neighbors
-        const { indices: topKIndices } = tf.topk(
-            tf.neg(distances),
-            this.k,
-            true
+        const { indices: topKIndices } = tf.topk(tf.neg(distances), this.k);
+
+        return tf.gather(this.y, topKIndices);
+    }
+}
+
+export class KNNClassifier extends BaseKNN {
+    predict(x) {
+        const predictions = x.map((item) => this.getNeighbors(item));
+        return predictions.map((prediction) =>
+            this._findMostCommonLabel(prediction)
         );
-
-        const nearestLabels = tf.gather(this.y, topKIndices);
-
-        const prediction = findMostCommonLabel(nearestLabels);
-
-        return prediction;
     }
 
     _findMostCommonLabel(labels) {
@@ -56,5 +48,12 @@ export class KNN {
         });
 
         return uniqueLabels.values.arraySync()[maxArg.index];
+    }
+}
+
+export class KNNRegressor extends BaseKNN {
+    predict(x) {
+        const predictions = x.map((item) => this.getNeighbors(item));
+        return predictions.map((prediction) => tf.mean(prediction).arraySync());
     }
 }
