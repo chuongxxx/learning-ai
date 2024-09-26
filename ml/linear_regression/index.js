@@ -1,9 +1,9 @@
 import {
-  LinearRegressionOLS,
-  LinearRegressionGD1,
-  LinearRegressionGD2,
-  LinearRegressionSGD,
-  LinearRegressionNN,
+    LinearRegressionOLS,
+    LinearRegressionGD1,
+    LinearRegressionGD2,
+    LinearRegressionSGD,
+    LinearRegressionNN
 } from './model.js';
 
 const x = [[1], [2], [4]];
