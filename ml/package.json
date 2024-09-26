@@ -1,15 +1,25 @@
 {
-    "name": "ml",
-    "version": "1.0.0",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "",
-    "license": "ISC",
-    "description": "",
-    "dependencies": {
-        "@tensorflow/tfjs": "^4.21.0"
-    }
+  "author": "",
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.21.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
+    "prettier": "3.3.3"
+  },
+  "license": "ISC",
+  "main": "index.js",
+  "name": "ml",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint \"./**/*.js\" --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "version": "1.0.0"
 }
