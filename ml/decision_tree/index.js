@@ -1,4 +1,4 @@
-import { DecisionTreeClasssifier, DecisionTreeRegressor } from './model.js';
+import { DecisionTreeClassifier, DecisionTreeRegressor } from './model.js';
 
 const x1 = [
     [1, 1, 7],
@@ -12,7 +12,7 @@ const x1 = [
 
 const y1 = [0, 0, 1, 1, 1, 0, 0];
 
-const modelClassifier = new DecisionTreeClasssifier({
+const modelClassifier = new DecisionTreeClassifier({
     maxDepth: 5,
     criterion: 'gini'
 });

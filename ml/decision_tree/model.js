@@ -1,6 +1,6 @@
 import { gini, entropy, calculateSplitImpurity } from './criteria.js';
 
-export class DecisionTreeClasssifier {
+export class DecisionTreeClassifier {
     #depth = 0;
     #maxDepth = 5;
     #criterion = 'gini';
@@ -35,14 +35,14 @@ export class DecisionTreeClasssifier {
             this.#splitData(x, y, attribute, threshold);
 
         // Build the left and right subtrees
-        this.#left = new DecisionTreeClasssifier({
+        this.#left = new DecisionTreeClassifier({
             depth: this.#depth + 1,
             maxDepth: this.#maxDepth,
             criterion: this.#criterion
         });
         this.#left.fit(leftFeatures, leftLabels);
 
-        this.#right = new DecisionTreeClasssifier({
+        this.#right = new DecisionTreeClassifier({
             depth: this.#depth + 1,
             maxDepth: this.#maxDepth,
             criterion: this.#criterion
