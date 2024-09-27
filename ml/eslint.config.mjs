@@ -32,7 +32,8 @@ export default [
                     endOfLine: 'auto',
                     trailingComma: 'none'
                 }
-            ]
+            ],
+            'no-unused-private-class-members': 'off'
         }
     }
 ];
