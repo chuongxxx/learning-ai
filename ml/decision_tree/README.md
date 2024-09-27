@@ -41,13 +41,13 @@ The **Gini Index** measures the probability of incorrectly classifying a randoml
 
 #### Formula:
 
-$$ Gini = 1 - \sum\_{i=1}^{n} p_i^2 $$
+$$Gini = 1 - \sum_{i=1}^{n} p_i^2$$
 Where $p_i$ is the proportion of samples that belong to class $i$.
 
 #### Example:
 
 For a subset with 50% Class A and 50% Class B:
-$$ Gini = 1 - (0.5^2 + 0.5^2) = 0.5 $$
+$$Gini = 1 - (0.5^2 + 0.5^2) = 0.5$$
 
 ### 3.2 Entropy (For Classification)
 
@@ -55,13 +55,13 @@ $$ Gini = 1 - (0.5^2 + 0.5^2) = 0.5 $$
 
 #### Formula:
 
-$$ Entropy = - \sum\_{i=1}^{n} p_i \log_2 p_i $$
+$$Entropy = - \sum_{i=1}^{n} p_i \log_2 p_i$$
 Where $p_i$ is the proportion of samples that belong to class $i$.
 
 #### Example:
 
 For a subset with 50% Class A and 50% Class B:
-$$ Entropy = - (0.5 \log_2 0.5 + 0.5 \log_2 0.5) = 1 $$
+$$Entropy = - (0.5 \log_2 0.5 + 0.5 \log_2 0.5) = 1$$
 
 ### 3.3 Mean Squared Error (For Regression)
 
@@ -69,13 +69,13 @@ In regression tasks, **Mean Squared Error (MSE)** is used to evaluate the qualit
 
 #### Formula:
 
-$$ MSE = \frac{1}{n} \sum\_{i=1}^{n} (y_i - \hat{y})^2 $$
+$$MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y})^2$$
 Where $y_i$ is the actual value, and $\hat{y}$ is the predicted value (mean of the subset).
 
 #### Example:
 
 For actual values [3, 4, 5] and predicted value 4:
-$$ MSE = \frac{1}{3}((3 - 4)^2 + (4 - 4)^2 + (5 - 4)^2) = 0.67 $$
+$$MSE = \frac{1}{3}((3 - 4)^2 + (4 - 4)^2 + (5 - 4)^2) = 0.67$$
 
 ---
 
