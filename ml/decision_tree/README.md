@@ -2,129 +2,119 @@
 
 ## 1. Introduction
 
-A **Decision Tree** is a supervised learning algorithm used for classification and regression tasks. The tree splits the data based on feature values to reach a decision about a target variable. The goal of building a Decision Tree is to find the best splits in the dataset that minimize impurity, leading to better classification or regression performance.
+A **Decision Tree** is a supervised learning algorithm used for both classification and regression tasks. The tree splits data based on feature values to make predictions. The goal is to construct a tree that best separates the data by minimizing impurity at each split, thus improving the model's accuracy in classification or minimizing error in regression.
 
 ### Key Concepts:
 
--   **Node**: A point in the decision tree where data is split.
--   **Leaf Node**: The end node where a decision or classification is made.
--   **Root Node**: The starting node containing the full dataset.
--   **Splitting**: The process of dividing data into subsets based on a specific feature.
--   **Depth**: The number of levels from the root node to a leaf node.
--   **Criterion**: The method used to evaluate the quality of a split.
+-   **Node**: A point in the tree where data is split.
+-   **Leaf Node**: The terminal node where a final decision or prediction is made.
+-   **Root Node**: The top node representing the entire dataset.
+-   **Splitting**: The process of dividing the dataset into smaller subsets based on feature values.
+-   **Depth**: The number of levels from the root to a leaf node.
+-   **Criterion**: The measure used to evaluate the quality of a split (e.g., Gini Index, Entropy, Mean Squared Error).
 
 ---
 
-## 2. Criteria for Splitting
+## 2. Decision Tree Types
 
-When constructing a Decision Tree, we need to decide how to split the data at each node. Commonly used criteria include **Gini Index** and **Entropy** (Information Gain). These measures help to identify the best splits by reducing the impurity in the data.
+### 2.1 Decision Tree Classifier
 
-### 2.1 Gini Impurity
+A **Decision Tree Classifier** is used for classification tasks where the target variable is categorical. The goal is to split the data into subsets that are as homogeneous as possible regarding the target class.
 
-The **Gini Index** measures the probability of incorrectly classifying a randomly chosen element from the dataset if it were randomly labeled according to the distribution of class labels in the subset. A lower Gini Index indicates a more homogeneous subset.
+-   **Criterion for Splitting**: Measures such as **Gini Index** or **Entropy** are used to evaluate the quality of splits.
+-   **Prediction**: At the leaf nodes, the majority class of the samples in that node is used as the prediction.
 
-**Formula**:
-$$Gini = 1 - \sum_{i=1}^{n} p_{i}^{2}$$
-Where $p_{i}$ is the probability of an element belonging to class $i$.
+### 2.2 Decision Tree Regressor
 
-#### Example:
+A **Decision Tree Regressor** is used for regression tasks where the target variable is continuous. The goal is to split the data in a way that minimizes the variance in the target variable for each subset.
 
-If the class distribution in a subset is 50% Class A and 50% Class B, the Gini Index is calculated as:
-
-$$
-Gini = 1 - (0.5^2 + 0.5^2) = 0.5
-$$
-
-### 2.2 Entropy (Information Gain)
-
-**Entropy** measures the disorder or uncertainty in a dataset. The goal is to minimize entropy, meaning creating subsets that are as pure (homogeneous) as possible.
-
-**Formula**:
-$$Entropy = - \sum_{i=1}^{n} p_i \log_2 p_i$$
-Where $p_i$ is the proportion of class $i$ in the subset.
-
-#### Example:
-
-For a class distribution of 50% Class A and 50% Class B, the Entropy is:
-$$Entropy = - (0.5 \log_2 0.5 + 0.5 \log_2 0.5) = 1$$
+-   **Criterion for Splitting**: The **Mean Squared Error (MSE)** is commonly used to evaluate splits.
+-   **Prediction**: At the leaf nodes, the mean value of the target variable in that node is used as the prediction.
 
 ---
 
-## 3. Decision Tree Construction Steps
+## 3. Criteria for Splitting
 
-### 3.1 Initial Setup
+### 3.1 Gini Impurity (For Classification)
 
-Start by initializing the tree with parameters such as:
+The **Gini Index** measures the probability of incorrectly classifying a randomly chosen sample from a subset. A lower Gini Index indicates a more homogeneous subset, meaning the samples belong to a single class more often.
 
--   **maxDepth**: Maximum depth of the tree to avoid overfitting.
--   **criterion**: The criterion used to evaluate splits (Gini or Entropy).
+#### Formula:
 
-```js
-const tree = new DecisionTree({ maxDepth: 5, criterion: 'gini' });
-```
+$$ Gini = 1 - \sum\_{i=1}^{n} p_i^2 $$
+Where $p_i$ is the proportion of samples that belong to class $i$.
 
-### 3.2 Calculate Impurity
+#### Example:
 
-At each node, calculate the impurity of the current dataset using either Gini or Entropy. This is the measure used to determine how "pure" the subset of data is.
+For a subset with 50% Class A and 50% Class B:
+$$ Gini = 1 - (0.5^2 + 0.5^2) = 0.5 $$
 
-```js
-const impurity = this.#criterion === 'gini' ? gini(y) : entropy(y);
-```
+### 3.2 Entropy (For Classification)
 
--   If impurity = 0 (i.e., all instances have the same class), the node becomes a leaf node.
--   If the maximum depth is reached, the node also becomes a leaf node.
+**Entropy** is a measure of the uncertainty or disorder in a dataset. The goal is to reduce entropy, making the subsets as pure (homogeneous) as possible.
 
-### 3.3 Finding the Best Split
+#### Formula:
 
-To create a split, loop through each feature and find the threshold that minimizes the impurity of the resulting subsets.
+$$ Entropy = - \sum\_{i=1}^{n} p_i \log_2 p_i $$
+Where $p_i$ is the proportion of samples that belong to class $i$.
 
--   Loop through attributes: For each attribute, calculate possible split points.
--   Find optimal threshold: Find the threshold that minimizes the impurity after splitting.
+#### Example:
 
-```js
-const { attribute, threshold } = this.#findBestSplit(x, y);
-```
+For a subset with 50% Class A and 50% Class B:
+$$ Entropy = - (0.5 \log_2 0.5 + 0.5 \log_2 0.5) = 1 $$
 
-### 3.4 Split the Data
+### 3.3 Mean Squared Error (For Regression)
 
-After finding the best attribute and threshold, split the dataset into two parts:
+In regression tasks, **Mean Squared Error (MSE)** is used to evaluate the quality of a split. MSE measures the average of the squared differences between actual and predicted values.
 
--   Left Subtree: Instances where the feature value is less than the threshold.
--   Right Subtree: Instances where the feature value is greater than or equal to the threshold.
+#### Formula:
 
-```js
-const { leftFeatures, leftLabels, rightFeatures, rightLabels } =
-    this.#splitData(x, y, attribute, threshold);
-```
+$$ MSE = \frac{1}{n} \sum\_{i=1}^{n} (y_i - \hat{y})^2 $$
+Where $y_i$ is the actual value, and $\hat{y}$ is the predicted value (mean of the subset).
 
-### 3.5 Recursively Build Subtrees
+#### Example:
 
-Once the data is split, recursively apply the same procedure to the left and right subsets to continue building the tree.
+For actual values [3, 4, 5] and predicted value 4:
+$$ MSE = \frac{1}{3}((3 - 4)^2 + (4 - 4)^2 + (5 - 4)^2) = 0.67 $$
 
-```js
-this.#left = new DecisionTree(this.#depth + 1, this.#maxDepth, this.#criterion);
-this.#left.fit(leftFeatures, leftLabels);
+---
 
-this.#right = new DecisionTree(
-    this.#depth + 1,
-    this.#maxDepth,
-    this.#criterion
-);
-this.#right.fit(rightFeatures, rightLabels);
-```
+## 4. Decision Tree Construction Steps
 
-### 3.6 Leaf Nodes and Predictions
+### 4.1 Initial Setup
 
-When a node is a leaf, it stores the majority class of its instances. Predictions for new data are made by traversing the tree from the root to a leaf node, comparing feature values with split thresholds.
+Initialize the Decision Tree with parameters such as the maximum depth and the criterion for splitting.
 
-```js
-if (this.#label !== null) {
-    return this.#label;
-}
+### 4.2 Calculate Impurity or Error
 
-if (features[this.#splitAttribute] < this.#threshold) {
-    return this.#left.predict(features);
-} else {
-    return this.#right.predict(features);
-}
-```
+At each node, calculate the impurity (for classification) or error (for regression) using the specified criterion. If the impurity is 0 (or error is minimal), or the maximum depth is reached, the node becomes a leaf.
+
+### 4.3 Finding the Best Split
+
+For each feature, evaluate all possible split points and find the threshold that minimizes the impurity or error after splitting.
+
+### 4.4 Split the Data
+
+Split the dataset into two subsets based on the selected feature and threshold:
+
+-   Left Subset: Samples where the feature value is less than the threshold.
+-   Right Subset: Samples where the feature value is greater than or equal to the threshold.
+
+### 4.5 Recursively Build Subtrees
+
+Recursively apply the same procedure to the left and right subsets until leaf nodes are reached or the maximum depth is attained.
+
+### 4.6 Leaf Nodes and Predictions
+
+At the leaf nodes, the tree either returns the majority class (for classification) or the mean value (for regression) as the prediction.
+
+## 5. Decision Tree Classifier vs. Decision Tree Regressor
+
+The following table summarizes the key differences between Decision Tree Classifiers and Regressors:
+
+| **Aspect**                  | **Classifier**                                                 | **Regressor**                                    |
+| --------------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
+| **Target Variable**         | Categorical                                                    | Continuous                                       |
+| **Splitting Criteria**      | Gini Impurity / Entropy                                        | Mean Squared Error (MSE)                         |
+| **Prediction at Leaf Node** | Majority class of the data subset                              | Mean value of the data subset                    |
+| **Use Cases**               | Classification tasks (e.g., spam detection, image recognition) | Regression tasks (e.g., predicting house prices) |
