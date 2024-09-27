@@ -1,5 +1,4 @@
-import { calculateSplitImpurity } from './criteria.js';
-import { gini, entropy } from './criteria.js';
+import { gini, entropy, calculateSplitImpurity } from './criteria.js';
 
 export class DecisionTree {
     #depth = 0;
