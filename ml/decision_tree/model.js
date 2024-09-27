@@ -35,19 +35,19 @@ export class DecisionTree {
             this.#splitData(x, y, attribute, threshold);
 
         // Build the left and right subtrees
-        this.left = new DecisionTree(
+        this.#left = new DecisionTree(
             this.#depth + 1,
             this.#maxDepth,
             this.#criterion
         );
-        this.left.fit(leftFeatures, leftLabels);
+        this.#left.fit(leftFeatures, leftLabels);
 
-        this.right = new DecisionTree(
+        this.#right = new DecisionTree(
             this.#depth + 1,
             this.#maxDepth,
             this.#criterion
         );
-        this.right.fit(rightFeatures, rightLabels);
+        this.#right.fit(rightFeatures, rightLabels);
     }
 
     #majorityVote(labels) {
