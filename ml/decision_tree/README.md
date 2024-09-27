@@ -30,9 +30,10 @@ Where $p_{i}$ is the probability of an element belonging to class $i$.
 #### Example:
 
 If the class distribution in a subset is 50% Class A and 50% Class B, the Gini Index is calculated as:
-\[
+
+$$
 Gini = 1 - (0.5^2 + 0.5^2) = 0.5
-\]
+$$
 
 ### 2.2 Entropy (Information Gain)
 
