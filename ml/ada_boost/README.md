@@ -45,9 +45,9 @@ Where:
 Trong đó:
 
 -   $w_i$ is the weight of sample $i$.  
-    _$w_i$ là trọng số của mẫu $i$._
+    $w_i$ là trọng số của mẫu $i$.
 -   $I$ is the indicator function, equal to 1 if misclassified and 0 if correct.  
-    _$I$ là hàm chỉ thị, bằng 1 nếu phân loại sai và 0 nếu đúng._
+    $I$ là hàm chỉ thị, bằng 1 nếu phân loại sai và 0 nếu đúng.
 
 ### Step 4: Update Weights / Bước 4: Cập nhật trọng số
 
@@ -90,11 +90,11 @@ Where:
 _Trong đó:_
 
 -   $H(x)$ is the strong classifier.  
-    _$H(x)$ là strong classifier._
+    $H(x)$ là strong classifier.
 -   $h_t(x)$ is the weak classifier at iteration $t$.  
-    _$h_t(x)$ là weak classifier tại vòng lặp $t$._
+    $h_t(x)$ là weak classifier tại vòng lặp $t$.
 -   $\alpha_t$ is the weight of the weak classifier.  
-    _$\alpha_t$ là trọng số của weak classifier._
+    $\alpha_t$ là trọng số của weak classifier.
 
 ## Conclusion / Kết luận
 
