@@ -1,8 +1,11 @@
-import { DecisionTreeClassifier, DecisionTreeRegressor } from '../decision_tree/model.js';
+import {
+    DecisionTreeClassifier,
+    DecisionTreeRegressor
+} from '../decision_tree/model.js';
 
 // Random Forest Model
 export class RandomForestClassifier {
-    constructor({numTrees = 10, maxDepth = 5, criterion = 'gini'}) {
+    constructor({ numTrees = 10, maxDepth = 5, criterion = 'gini' }) {
         this.numTrees = numTrees;
         this.trees = [];
         this.maxDepth = maxDepth;
@@ -24,7 +27,7 @@ export class RandomForestClassifier {
 
     // Predict using majority voting from all trees
     predict(features) {
-        const predictions = this.trees.map(tree => tree.predict(features));
+        const predictions = this.trees.map((tree) => tree.predict(features));
         return this.#majorityVote(predictions);
     }
 
@@ -54,7 +57,12 @@ export class RandomForestClassifier {
 }
 
 export class RandomForestRegressor {
-    constructor({numTrees = 10, maxDepth = 5, minLoss = 0.01, minLeafSize = 1}) {
+    constructor({
+        numTrees = 10,
+        maxDepth = 5,
+        minLoss = 0.01,
+        minLeafSize = 1
+    }) {
         this.numTrees = numTrees;
         this.trees = [];
         this.maxDepth = maxDepth;
@@ -77,8 +85,11 @@ export class RandomForestRegressor {
     }
 
     predict(features) {
-        const predictions = this.trees.map(tree => tree.predict(features));
-        return predictions.reduce((sum, value) => sum + value, 0) / predictions.length; // Average prediction
+        const predictions = this.trees.map((tree) => tree.predict(features));
+        return (
+            predictions.reduce((sum, value) => sum + value, 0) /
+            predictions.length
+        ); // Average prediction
     }
 
     #bootstrapSample(x, y) {
