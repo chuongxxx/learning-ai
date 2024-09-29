@@ -96,11 +96,6 @@ _Trong đó:_
 -   $\alpha_t$ is the weight of the weak classifier.  
     $\alpha_t$ là trọng số của weak classifier.
 
-## Conclusion / Kết luận
-
-**AdaBoost** is a powerful and flexible method in machine learning, especially in classification tasks. It works effectively even with simple weak classifiers and can significantly improve the model's accuracy.  
-_**AdaBoost** là một phương pháp mạnh mẽ và linh hoạt trong học máy, đặc biệt trong các bài toán phân loại. Nó hoạt động hiệu quả ngay cả với các weak classifiers đơn giản và có thể cải thiện đáng kể độ chính xác của mô hình._
-
 ## References / Tài liệu tham khảo
 
 -   [Wikipedia: AdaBoost](https://en.wikipedia.org/wiki/AdaBoost)
