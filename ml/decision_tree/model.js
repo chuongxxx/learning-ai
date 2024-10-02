@@ -208,7 +208,8 @@ export class DecisionTreeRegressor {
         let bestLoss = Infinity;
         let bestAttribute = null;
         let bestThreshold = null;
-        for (let attribute = 0; attribute < features[0].length; attribute++) {
+
+        for (let attribute = 0; attribute < features[0]?.length; attribute++) {
             const values = features.map((row) => row[attribute]);
             const uniqueValues = Array.from(new Set(values)).sort(
                 (a, b) => a - b
