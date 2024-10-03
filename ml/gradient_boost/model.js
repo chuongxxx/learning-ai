@@ -15,8 +15,8 @@ export class GradientBoost {
         let pred = y.map(() => this.yMean);
 
         for (let i = 0; i < this.epochs; i++) {
-            // const loss = this.#calculateLoss(y, pred);
-            // console.log('Epoch:', i, '---', 'Loss:', loss);
+            const loss = this.#calculateLoss(y, pred);
+            console.log('Epoch:', i, '---', 'Loss:', loss);
             const gradient = this.#calculateGradient(y, pred);
 
             const tree = new DecisionTreeRegressor({ maxDepth: this.maxDepth });
