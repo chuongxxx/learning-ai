@@ -1,272 +1,226 @@
-class InformationGainDecisionTree {
-    constructor(maxDepth, minGain = 0.01) {
+import { MSE } from '../common/loss.js';
+
+class DecisionTreeRegressor {
+    constructor({
+        maxDepth = 5,
+        subsample = 1.0,
+        minChildWeight = 1.0,
+        lambda = 1.0,
+        gamma = 0.0,
+        idxs = null
+    }) {
         this.maxDepth = maxDepth;
-        this.minGain = minGain;
-        this.root = null;
+        this.subsample = subsample;
+        this.minChildWeight = minChildWeight;
+        this.lambda = lambda;
+        this.gamma = gamma;
+
+        this.idxs = idxs;
+
+        this.value = 0;
+        this.bestScore = 0;
+
+        this.left = null;
+        this.right = null;
     }
 
-    fit(X, y) {
-        const { gradients, hessians } = this.computeGradientsAndHessians(
-            y,
-            this.predictInitialValue(y)
-        );
-        this.root = this.buildTree(X, gradients, hessians, 0);
-    }
+    train(X, gradients, hessians) {
+        this.X = X;
+        this.gradients = gradients;
+        this.hessians = hessians;
 
-    // Tính toán gradients và hessians
-    computeGradientsAndHessians(y, preds) {
-        const gradients = y.map((yi, i) => preds[i] - yi); // ∂L/∂f(x)
-        const hessians = gradients.map(() => 1); // ∂^2L/∂f(x)^2 = 1 cho MSE
-        return { gradients, hessians };
-    }
-
-    // Dự đoán giá trị khởi tạo
-    predictInitialValue(y) {
-        return y.reduce((a, b) => a + b, 0) / y.length; // Giá trị trung bình
-    }
-
-    buildTree(X, gradients, hessians, depth) {
-        if (depth >= this.maxDepth || this.shouldPrune(gradients, hessians)) {
-            return this.createLeafNode(gradients, hessians);
+        if (!this.idxs) {
+            this.idxs = [...Array(this.X.length).keys()];
         }
 
-        // Chia nhánh và tạo các node
-        const {
-            leftData,
-            rightData,
-            leftGradients,
-            rightGradients,
-            leftHessians,
-            rightHessians
-        } = this.splitNode(X, gradients, hessians);
+        // Tính toán giá trị ban đầu
+        this.value =
+            -gradients.reduce((acc, gi) => acc + gi, 0) /
+            (hessians.reduce((acc, hi) => acc + hi, 0) + this.lambda);
 
-        const leftNode = this.buildTree(
-            leftData,
-            leftGradients,
-            leftHessians,
-            depth + 1
+        if (this.maxDepth > 0) {
+            for (let i = 0; i < this.X[0].length; i++) {
+                this.#findBetterSplit(i);
+            }
+
+            if (this.#isLeaf()) return;
+
+            const [leftIdxs, rightIdxs] = this.#splitIndexes();
+            this.left = new DecisionTreeRegressor({
+                maxDepth: this.maxDepth - 1,
+                subsample: this.subsample,
+                minChildWeight: this.minChildWeight,
+                lambda: this.lambda,
+                gamma: this.gamma,
+                idxs: leftIdxs
+            });
+            this.right = new DecisionTreeRegressor({
+                maxDepth: this.maxDepth - 1,
+                subsample: this.subsample,
+                minChildWeight: this.minChildWeight,
+                lambda: this.lambda,
+                gamma: this.gamma,
+                idxs: rightIdxs
+            });
+
+            // Gọi train cho child nodes
+            this.left.train(this.X, this.gradients, this.hessians);
+            this.right.train(this.X, this.gradients, this.hessians);
+        }
+    }
+
+    #findBetterSplit(featureIdx) {
+        const featureValues = this.idxs.map((idx) => this.X[idx][featureIdx]);
+        const sortedIdx = [...featureValues.keys()].sort(
+            (a, b) => featureValues[a] - featureValues[b]
         );
-        const rightNode = this.buildTree(
-            rightData,
-            rightGradients,
-            rightHessians,
-            depth + 1
-        );
 
-        return {
-            left: leftNode,
-            right: rightNode,
-            feature: this.splitFeature,
-            threshold: this.splitThreshold
-        }; // Tạo node cho cây
-    }
+        let gradientLeft = 0;
+        let hessianLeft = 0;
+        let gradientRight = this.gradients.reduce((acc, gi) => acc + gi, 0);
+        let hessianRight = this.hessians.reduce((acc, hi) => acc + hi, 0);
 
-    // Kiểm tra điều kiện cắt tỉa
-    shouldPrune(gradients, hessians) {
-        const gain = this.calculateGain(gradients, hessians);
-        return gain < this.minGain;
-    }
+        for (let i = 0; i < sortedIdx.length - 1; i++) {
+            const idx = sortedIdx[i];
 
-    calculateGain(gradients, hessians) {
-        const totalGradient = gradients.reduce((a, b) => a + b, 0);
-        const totalHessian = hessians.reduce((a, b) => a + b, 0);
-        return (totalGradient * totalGradient) / (totalHessian + 1e-10);
-    }
+            const gi = this.gradients[this.idxs[idx]];
+            const hi = this.hessians[this.idxs[idx]];
 
-    // Tạo node lá
-    createLeafNode(gradients, hessians) {
-        const value =
-            gradients.reduce((a, b) => a + b, 0) /
-            (hessians.reduce((a, b) => a + b, 0) + 1e-10);
-        return { isLeaf: true, value }; // Giá trị cho node lá
-    }
+            gradientLeft += gi;
+            hessianLeft += hi;
+            gradientRight -= gi;
+            hessianRight -= hi;
 
-    splitNode(X, gradients, hessians) {
-        // Thực hiện phân chia đơn giản dựa trên một đặc trưng và ngưỡng
-        let bestGain = -Infinity;
-        let bestSplit = null;
+            const [currentFeatureValue, nextFeatureValue] = [
+                featureValues[sortedIdx[i]],
+                featureValues[sortedIdx[i + 1]]
+            ];
 
-        // Thử tất cả các đặc trưng và ngưỡng để tìm phân chia tốt nhất
-        for (let featureIndex = 0; featureIndex < X[0].length; featureIndex++) {
-            const thresholds = [...new Set(X.map((row) => row[featureIndex]))]; // Các ngưỡng khác nhau cho đặc trưng này
+            if (
+                hessianLeft < this.minChildWeight ||
+                hessianRight < this.minChildWeight ||
+                currentFeatureValue === nextFeatureValue
+            )
+                continue;
 
-            for (let threshold of thresholds) {
-                const {
-                    leftData,
-                    rightData,
-                    leftGradients,
-                    rightGradients,
-                    leftHessians,
-                    rightHessians
-                } = this.splitData(
-                    X,
-                    gradients,
-                    hessians,
-                    featureIndex,
-                    threshold
-                );
-
-                const gain =
-                    this.calculateGain(leftGradients, leftHessians) +
-                    this.calculateGain(rightGradients, rightHessians) -
-                    this.calculateGain(gradients, hessians);
-
-                if (gain > bestGain) {
-                    bestGain = gain;
-                    bestSplit = {
-                        featureIndex,
-                        threshold,
-                        leftData,
-                        rightData,
-                        leftGradients,
-                        rightGradients,
-                        leftHessians,
-                        rightHessians
-                    };
-                }
+            const gain = this.#calcGain(
+                gradientLeft,
+                hessianLeft,
+                gradientRight,
+                hessianRight
+            );
+            if (gain > this.bestScore) {
+                this.bestScore = gain;
+                this.splitFeatureIdx = featureIdx;
+                this.threshold = (currentFeatureValue + nextFeatureValue) / 2;
             }
         }
-
-        if (bestSplit) {
-            this.splitFeature = bestSplit.featureIndex;
-            this.splitThreshold = bestSplit.threshold;
-            return {
-                leftData: bestSplit.leftData,
-                rightData: bestSplit.rightData,
-                leftGradients: bestSplit.leftGradients,
-                rightGradients: bestSplit.rightGradients,
-                leftHessians: bestSplit.leftHessians,
-                rightHessians: bestSplit.rightHessians
-            };
-        }
-
-        return {
-            leftData: X,
-            rightData: [],
-            leftGradients: gradients,
-            rightGradients: [],
-            leftHessians: hessians,
-            rightHessians: []
-        };
     }
 
-    splitData(X, gradients, hessians, featureIndex, threshold) {
-        const leftData = [];
-        const rightData = [];
-        const leftGradients = [];
-        const rightGradients = [];
-        const leftHessians = [];
-        const rightHessians = [];
-
-        for (let i = 0; i < X.length; i++) {
-            if (X[i][featureIndex] <= threshold) {
-                leftData.push(X[i]);
-                leftGradients.push(gradients[i]);
-                leftHessians.push(hessians[i]);
-            } else {
-                rightData.push(X[i]);
-                rightGradients.push(gradients[i]);
-                rightHessians.push(hessians[i]);
-            }
-        }
-
-        return {
-            leftData,
-            rightData,
-            leftGradients,
-            rightGradients,
-            leftHessians,
-            rightHessians
-        };
+    #calcGain(gradientLeft, hessianLeft, gradientRight, hessianRight) {
+        return (
+            0.5 *
+                (gradientLeft ** 2 / (hessianLeft + this.lambda) +
+                    gradientRight ** 2 / (hessianRight + this.lambda)) -
+            (gradientLeft + gradientRight) ** 2 /
+                (hessianLeft + hessianRight + this.lambda) -
+            this.gamma / 2
+        );
     }
 
-    predict(x) {
-        return this.predictNode(this.root, x);
+    #splitIndexes() {
+        const splitFeatureValues = this.idxs.map(
+            (idx) => this.X[idx][this.splitFeatureIdx]
+        );
+        return [[], []].map((arr) =>
+            splitFeatureValues.forEach((val, idx) =>
+                val <= this.threshold ? arr.push(this.idxs[idx]) : null
+            )
+        );
     }
 
-    predictNode(node, x) {
-        if (node.isLeaf) {
-            return node.value;
-        }
+    #isLeaf() {
+        return this.bestScore === 0;
+    }
 
-        if (x[node.feature] <= node.threshold) {
-            return this.predictNode(node.left, x);
-        } else {
-            return this.predictNode(node.right, x);
-        }
+    predict(row) {
+        return this.#isLeaf()
+            ? this.value
+            : row[this.splitFeatureIdx] <= this.threshold
+              ? this.left.predict(row)
+              : this.right.predict(row);
+    }
+
+    predictRows(X) {
+        return X.map((row) => this.predict(row));
     }
 }
+export class XGBoostRegressor {
+    constructor({
+        numTrees = 10,
+        learningRate = 0.3,
+        maxDepth = 5,
+        subsample = 1.0,
+        lambda = 0.0,
+        gamma = 0.0,
+        minChildWeight = 1.0
+    }) {
+        this.numTrees = numTrees;
+        this.maxDepth = maxDepth;
+        this.learningRate = learningRate;
+        this.subsample = subsample;
+        this.lambda = lambda;
+        this.gamma = gamma;
+        this.minChildWeight = minChildWeight;
 
-export class XGBoost {
-    constructor(maxDepth = 3, learningRate = 0.1, nEstimators = 100) {
-        this.maxDepth = maxDepth; // Độ sâu tối đa của cây
-        this.learningRate = learningRate; // Tốc độ học
-        this.nEstimators = nEstimators; // Số lượng cây
-        this.baseLearners = []; // Danh sách các cây quyết định
-        this.initValue = 0; // Giá trị khởi tạo f(0)(x)
+        this.yMean = null;
+        this.models = [];
     }
 
-    // Bước 1: Khởi tạo mô hình với giá trị không đổi
-    initialize(y) {
-        this.initValue = y.reduce((a, b) => a + b, 0) / y.length; // Giá trị trung bình
-    }
+    fit(X, y, verbose = false) {
+        this.yMean = y.reduce((a, b) => a + b, 0) / y.length;
 
-    // Bước 2: Tính toán gradients và hessians (MSE loss là ví dụ)
-    computeGradientsAndHessians(y, preds) {
-        const gradients = y.map((yi, i) => preds[i] - yi); // ∂L/∂f(x)
-        const hessians = gradients.map(() => 1); // ∂²L/∂f(x)² = 1 cho MSE
-        return { gradients, hessians };
-    }
+        let currentPredictions = Array(y.length).fill(this.yMean);
 
-    fitWeakLearner(X, gradients) {
-        const tree = new InformationGainDecisionTree(this.maxDepth);
-        tree.fit(X, gradients); // Huấn luyện cây với gradients
-        return tree;
-    }
+        for (let i = 0; i < this.numTrees; i++) {
+            const gradients = MSE.gradient(currentPredictions, y);
+            const hessians = MSE.hessian(currentPredictions, y);
 
-    // Bước 4: Cập nhật mô hình với các cây yếu mới
-    updateModel(tree, X) {
-        const predictions = X.map((x) => tree.predict(x)); // Dự đoán bằng cây
-        return predictions.map((pred) => this.learningRate * pred); // Cập nhật dự đoán với learning rate
-    }
+            const sampleIdxs =
+                this.subsample < 1.0
+                    ? [...Array(X.length).keys()]
+                          .sort(() => 0.5 - Math.random())
+                          .slice(0, Math.floor(this.subsample * X.length))
+                    : null;
 
-    fit(X, y) {
-        this.initialize(y); // Khởi tạo mô hình
+            const tree = new DecisionTreeRegressor({
+                maxDepth: this.maxDepth,
+                subsample: this.subsample,
+                minChildWeight: this.minChildWeight,
+                lambda: this.lambda,
+                gamma: this.gamma,
+                idxs: sampleIdxs
+            });
+            tree.train(X, gradients, hessians);
 
-        let currentPredictions = new Array(y.length).fill(this.initValue); // Bắt đầu với f(0)(x)
-
-        for (let m = 0; m < this.nEstimators; m++) {
-            const { gradients, hessians } = this.computeGradientsAndHessians(
-                y,
-                currentPredictions
-            );
-
-            // Huấn luyện cây yếu
-            const tree = this.fitWeakLearner(X, gradients, hessians);
-            this.baseLearners.push(tree); // Lưu cây vào danh sách
-
-            // Cập nhật dự đoán với cây yếu mới
-            const updates = this.updateModel(tree, X);
-
-            // f(m)(x) = f(m-1)(x) + α * new_predictions
             currentPredictions = currentPredictions.map(
-                (pred, i) => pred - updates[i]
+                (pred, j) => pred + this.learningRate * tree.predictRows(X)[j]
             );
+
+            this.models.push(tree);
+            if (verbose)
+                console.log(`[${i}] Train loss = ${MSE.loss(this.yMean, y)}`);
         }
     }
 
     predict(X) {
-        // Bắt đầu với giá trị khởi tạo
-        let predictions = new Array(X.length).fill(this.initValue);
-
-        // Tính tổng tất cả các dự đoán của các cây yếu
-        for (let tree of this.baseLearners) {
-            const updates = X.map((x) => tree.predict(x)); // Dự đoán từ mỗi cây
-            predictions = predictions.map(
-                (pred, i) => pred - this.learningRate * updates[i]
-            ); // Cập nhật dự đoán
-        }
-
-        return predictions; // Trả về dự đoán cuối cùng
+        return this.models.reduce(
+            (preds, model) =>
+                preds.map(
+                    (pred, i) =>
+                        pred + this.learningRate * model.predictRows(X)[i]
+                ),
+            Array(X.length).fill(this.yMean)
+        );
     }
 }
